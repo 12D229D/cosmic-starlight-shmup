@@ -1,0 +1,609 @@
+/* =============================================================
+   Cosmic Starlight Shmup — style.css
+   Sistema de diseño HSL neon espacial + marco arcade retro
+   ============================================================= */
+
+/* ── Variables de diseño ─────────────────────────────────── */
+:root {
+  --hue-laser:   180;   /* cian — proyectiles jugador */
+  --hue-plasma:  340;   /* rosa/rojo — proyectiles enemigos */
+  --hue-star:     45;   /* dorado — powerups y puntuación */
+  --hue-bg:      240;   /* azul oscuro espacial */
+  --hue-boss:    280;   /* violeta — jefes */
+  --hue-green:   130;   /* verde — shields */
+
+  --color-bg:        hsl(var(--hue-bg), 50%, 4%);
+  --color-bg-panel:  hsl(var(--hue-bg), 40%, 8%);
+  --color-panel-border: hsl(var(--hue-bg), 60%, 22%);
+
+  --color-cyan:    hsl(var(--hue-laser), 100%, 60%);
+  --color-pink:    hsl(var(--hue-plasma), 90%, 65%);
+  --color-gold:    hsl(var(--hue-star), 100%, 60%);
+  --color-violet:  hsl(var(--hue-boss), 80%, 65%);
+  --color-green:   hsl(var(--hue-green), 80%, 50%);
+  --color-white:   hsl(0, 0%, 95%);
+  --color-dim:     hsl(var(--hue-bg), 30%, 45%);
+
+  --glow-cyan:    0 0 8px hsl(var(--hue-laser), 100%, 70%), 0 0 20px hsl(var(--hue-laser), 100%, 50%);
+  --glow-pink:    0 0 8px hsl(var(--hue-plasma), 90%, 70%), 0 0 20px hsl(var(--hue-plasma), 90%, 50%);
+  --glow-gold:    0 0 8px hsl(var(--hue-star), 100%, 70%), 0 0 20px hsl(var(--hue-star), 100%, 50%);
+  --glow-violet:  0 0 8px hsl(var(--hue-boss), 80%, 70%), 0 0 20px hsl(var(--hue-boss), 80%, 55%);
+
+  --font-main:  'Orbitron', 'Share Tech Mono', monospace;
+  --font-mono:  'Share Tech Mono', monospace;
+
+  --cabinet-w: 860px;
+  --canvas-w:  480px;
+  --canvas-h:  640px;
+  --panel-w:   150px;
+  --radius:    8px;
+}
+
+/* ── Reset y base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-white);
+  font-family: var(--font-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Screens ─────────────────────────────────────────────── */
+.screen {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen.active { display: flex; }
+
+/* ── Arcade Cabinet ──────────────────────────────────────── */
+.arcade-cabinet {
+  display: flex;
+  flex-direction: column;
+  width: var(--cabinet-w);
+  border: 2px solid var(--color-panel-border);
+  border-radius: 12px;
+  background: hsl(var(--hue-bg), 45%, 6%);
+  box-shadow:
+    0 0 30px hsl(var(--hue-laser), 100%, 25%),
+    0 0 60px hsl(var(--hue-laser), 100%, 10%),
+    inset 0 0 30px hsl(var(--hue-bg), 60%, 3%);
+  overflow: hidden;
+}
+
+.arcade-cabinet.small-cabinet {
+  width: 600px;
+}
+
+/* Marquesina superior */
+.cabinet-marquee {
+  background: hsl(var(--hue-bg), 50%, 8%);
+  border-bottom: 2px solid var(--color-panel-border);
+  padding: 10px 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.cabinet-marquee.slim { padding: 6px 20px; }
+
+.marquee-text {
+  display: inline-block;
+  animation: marquee-scroll 22s linear infinite;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--color-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+@keyframes marquee-scroll {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Cuerpo del gabinete */
+.cabinet-body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex: 1;
+}
+
+.cabinet-body.centered {
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+/* Paneles laterales */
+.panel-left,
+.panel-right {
+  width: var(--panel-w);
+  background: var(--color-bg-panel);
+  border-color: var(--color-panel-border);
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.panel-left  { border-right: 2px solid var(--color-panel-border); }
+.panel-right { border-left:  2px solid var(--color-panel-border); }
+
+.panel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.panel-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--color-dim);
+  text-transform: uppercase;
+}
+
+.panel-value {
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--color-white);
+}
+
+.panel-value.gold    { color: var(--color-gold);   text-shadow: var(--glow-gold); }
+.panel-value.cyan    { color: var(--color-cyan);   text-shadow: var(--glow-cyan); }
+.panel-value.pink    { color: var(--color-pink);   text-shadow: var(--glow-pink); }
+.panel-value.small   { font-size: 0.7rem; }
+.panel-info.legend   { margin-top: auto; }
+
+.ctrl-row {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--color-dim);
+  margin-top: 2px;
+}
+.ctrl-row.small { font-size: 0.55rem; }
+
+.key {
+  background: hsl(var(--hue-bg), 40%, 15%);
+  border: 1px solid var(--color-panel-border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.55rem;
+  color: var(--color-cyan);
+}
+
+/* ── Canvas Wrapper ─────────────────────────────────────── */
+.canvas-wrapper {
+  position: relative;
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  flex-shrink: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+#canvas-menu, #canvas-main {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+/* Efecto scanlines sobre el canvas */
+.canvas-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.07) 3px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Menú overlay ─────────────────────────────────────────── */
+.menu-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 30px 20px;
+  z-index: 5;
+}
+
+.menu-title {
+  text-align: center;
+}
+
+.title-main {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-cyan);
+  text-shadow: var(--glow-cyan);
+  animation: title-pulse 3s ease-in-out infinite;
+}
+
+@keyframes title-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.85; text-shadow: 0 0 20px var(--color-cyan), 0 0 50px var(--color-cyan); }
+}
+
+.title-sub {
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  color: var(--color-pink);
+  text-shadow: var(--glow-pink);
+  margin-top: 6px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 260px;
+}
+
+.menu-hint {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--color-dim);
+}
+
+/* ── Botones Arcade ─────────────────────────────────────── */
+.arcade-btn {
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 12px 20px;
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.arcade-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s;
+}
+
+.arcade-btn:hover::before { background: rgba(255,255,255,0.08); }
+.arcade-btn:active { transform: scale(0.96); }
+
+.arcade-btn.primary {
+  background: linear-gradient(135deg,
+    hsl(var(--hue-laser), 100%, 30%),
+    hsl(var(--hue-laser), 100%, 20%)
+  );
+  color: var(--color-cyan);
+  box-shadow: 0 0 12px hsl(var(--hue-laser), 100%, 30%), 0 2px 0 hsl(var(--hue-laser), 100%, 15%);
+  border: 1px solid hsl(var(--hue-laser), 100%, 40%);
+}
+
+.arcade-btn.secondary {
+  background: hsl(var(--hue-bg), 40%, 12%);
+  color: var(--color-dim);
+  border: 1px solid var(--color-panel-border);
+}
+
+.arcade-btn.secondary:hover { color: var(--color-white); border-color: var(--color-cyan); }
+.arcade-btn.small { padding: 8px 16px; font-size: 0.7rem; }
+
+.mt { margin-top: 20px; }
+
+/* ── HUD elementos ─────────────────────────────────────── */
+.lives-row, .bombs-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.life-icon, .bomb-icon {
+  font-size: 0.9rem;
+  transition: opacity 0.3s;
+}
+
+.life-icon.used, .bomb-icon.used { opacity: 0.15; }
+
+/* Barra de poder */
+.power-bar {
+  width: 100%;
+  height: 6px;
+  background: hsl(var(--hue-bg), 40%, 15%);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.power-fill {
+  height: 100%;
+  width: 33%;
+  background: linear-gradient(90deg, var(--color-cyan), hsl(var(--hue-laser), 100%, 80%));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 6px var(--color-cyan);
+}
+
+/* Barra de escudo */
+.shield-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: hsl(var(--hue-bg), 40%, 15%);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.shield-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-green), hsl(var(--hue-green), 90%, 70%));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 6px var(--color-green);
+}
+
+/* Boss HP bar */
+.boss-hp-wrap {
+  width: 100%;
+  height: 8px;
+  background: hsl(var(--hue-bg), 40%, 15%);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+  border: 1px solid hsl(var(--hue-plasma), 80%, 30%);
+}
+
+.boss-hp-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--color-pink), hsl(var(--hue-plasma), 100%, 75%));
+  border-radius: 4px;
+  transition: width 0.2s ease;
+  box-shadow: 0 0 8px var(--color-pink);
+}
+
+/* Contador de FPS */
+.fps-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--color-dim);
+}
+
+/* ── Overlays del juego ─────────────────────────────────── */
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+}
+
+.game-overlay.hidden { display: none; }
+
+.overlay-box {
+  background: hsl(var(--hue-bg), 45%, 7%);
+  border: 2px solid var(--color-panel-border);
+  border-radius: 12px;
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 0 30px hsl(var(--hue-laser), 100%, 15%);
+}
+
+.overlay-box.slim { padding: 20px 30px; }
+
+.overlay-title {
+  font-size: 1.4rem;
+  letter-spacing: 0.2em;
+  color: var(--color-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+.overlay-title.gold {
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold);
+}
+
+/* Boss Warning */
+.boss-warning-text {
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--color-pink);
+  text-shadow: var(--glow-pink);
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+}
+
+/* ── Game Over / Victory ─────────────────────────────────── */
+.game-over-box, .victory-box, .scores-box {
+  background: hsl(var(--hue-bg), 45%, 7%);
+  border: 2px solid var(--color-panel-border);
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 0 40px hsl(var(--hue-laser), 100%, 15%);
+}
+
+.gameover-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--color-pink);
+  text-shadow: var(--glow-pink);
+}
+
+.gameover-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid hsl(var(--hue-bg), 40%, 15%);
+  padding-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--color-dim);
+}
+
+.stat-value {
+  font-size: 0.85rem;
+  color: var(--color-white);
+}
+
+.stat-value.gold  { color: var(--color-gold);  text-shadow: var(--glow-gold); }
+.stat-value.cyan  { color: var(--color-cyan);  text-shadow: var(--glow-cyan); }
+.stat-value.pink  { color: var(--color-pink);  text-shadow: var(--glow-pink); }
+
+.new-record {
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 0.15em;
+}
+
+.new-record.hidden { display: none; }
+
+.go-buttons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Victory ─────────────────────────────────────────────── */
+.victory-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 0.1em;
+}
+
+.victory-sub {
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  color: var(--color-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+/* ── Scores Table ─────────────────────────────────────────── */
+.scores-title {
+  font-size: 1.5rem;
+  color: var(--color-gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 0.15em;
+}
+
+.scores-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.scores-table th {
+  color: var(--color-dim);
+  letter-spacing: 0.12em;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-panel-border);
+  text-align: left;
+}
+
+.scores-table td {
+  padding: 8px 8px;
+  border-bottom: 1px solid hsl(var(--hue-bg), 40%, 12%);
+  color: var(--color-white);
+}
+
+.scores-table tr:first-child td { color: var(--color-gold); }
+.scores-table tr:nth-child(2) td { color: hsl(0, 0%, 80%); }
+.scores-table tr:nth-child(3) td { color: hsl(30, 80%, 60%); }
+
+/* ── Footer del gabinete ─────────────────────────────────── */
+.cabinet-footer {
+  background: hsl(var(--hue-bg), 50%, 5%);
+  border-top: 2px solid var(--color-panel-border);
+  padding: 8px 20px;
+  text-align: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--color-dim);
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ── Animaciones utilitarias ─────────────────────────────── */
+.blink {
+  animation: blink-anim 1.2s step-end infinite;
+}
+
+.blink-fast {
+  animation: blink-anim 0.5s step-end infinite;
+}
+
+@keyframes blink-anim {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Responsive básico ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  :root {
+    --cabinet-w: 100vw;
+    --canvas-w:  320px;
+    --canvas-h:  427px;
+    --panel-w:   80px;
+  }
+
+  .title-main    { font-size: 1.8rem; }
+  .panel-label   { font-size: 0.45rem; }
+  .panel-value   { font-size: 0.7rem; }
+  .ctrl-row      { font-size: 0.5rem; }
+  .arcade-btn    { font-size: 0.65rem; padding: 10px 14px; }
+  .cabinet-footer { font-size: 0.5rem; gap: 6px; }
+}

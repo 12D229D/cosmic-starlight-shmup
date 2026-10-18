@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Cosmic Starlight Shmup — Bullet Hell arcade 2D espacial con patrones Danmaku, jefes de múltiples fases y síntesis chiptune." />
+  <title>Cosmic Starlight Shmup — Bullet Hell Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ==================== PANTALLA: MENÚ PRINCIPAL ==================== -->
+  <div id="screen-menu" class="screen active">
+    <div class="arcade-cabinet">
+      <div class="cabinet-marquee">
+        <span class="marquee-text">✦ COSMIC STARLIGHT ✦ SHOOT EM UP ✦ BULLET HELL ✦</span>
+      </div>
+
+      <div class="cabinet-body">
+        <div class="panel-left">
+          <div class="panel-info">
+            <p class="panel-label">HIGH SCORE</p>
+            <p id="menu-highscore" class="panel-value gold">000000</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">CREDITS</p>
+            <p class="panel-value">★★★</p>
+          </div>
+          <div class="panel-info legend">
+            <p class="panel-label">CONTROLS</p>
+            <p class="ctrl-row"><span class="key">WASD/↑↓←→</span> Move</p>
+            <p class="ctrl-row"><span class="key">SHIFT</span> Focus</p>
+            <p class="ctrl-row"><span class="key">Z / SPACE</span> Shoot</p>
+            <p class="ctrl-row"><span class="key">X</span> Bomb</p>
+            <p class="ctrl-row"><span class="key">ESC</span> Pause</p>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper" id="canvas-wrapper-menu">
+          <canvas id="canvas-menu" width="480" height="640"></canvas>
+          <div class="menu-overlay">
+            <div class="menu-title">
+              <h1 class="title-main">COSMIC<br/>STARLIGHT</h1>
+              <p class="title-sub">SHOOT EM UP</p>
+            </div>
+            <div class="menu-buttons">
+              <button id="btn-start" class="arcade-btn primary" aria-label="Iniciar partida">▶ INSERT COIN</button>
+              <button id="btn-scores" class="arcade-btn secondary" aria-label="Ver tabla de récords">🏆 HIGH SCORES</button>
+              <button id="btn-sound-toggle" class="arcade-btn secondary small" aria-label="Alternar sonido" title="Sound On/Off">🔊 SOUND ON</button>
+            </div>
+            <p class="menu-hint blink">PRESS START</p>
+          </div>
+        </div>
+
+        <div class="panel-right">
+          <div class="panel-info">
+            <p class="panel-label">PLAYER</p>
+            <p class="panel-value cyan">STARLIGHT α</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">SECTORS</p>
+            <p class="panel-value">3</p>
+          </div>
+          <div class="panel-info legend">
+            <p class="panel-label">POWERUPS</p>
+            <p class="ctrl-row">★ Power Up</p>
+            <p class="ctrl-row">⚡ Laser</p>
+            <p class="ctrl-row">🚀 Missile</p>
+            <p class="ctrl-row">🛡 Shield</p>
+            <p class="ctrl-row">💣 Bomb</p>
+            <p class="ctrl-row">❤ Life</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cabinet-footer">
+        <span>© 2026 COSMIC STARLIGHT ARCADE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PANTALLA: JUEGO ==================== -->
+  <div id="screen-game" class="screen">
+    <div class="arcade-cabinet">
+      <div class="cabinet-marquee slim">
+        <span id="game-marquee-text" class="marquee-text">✦ COSMIC STARLIGHT ✦ SECTOR 1 — ALPHA FRONTIER ✦</span>
+      </div>
+
+      <div class="cabinet-body">
+
+        <!-- Panel izquierdo: puntaje, vidas, nivel -->
+        <div class="panel-left">
+          <div class="panel-info">
+            <p class="panel-label">SCORE</p>
+            <p id="hud-score" class="panel-value gold">0</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">HI-SCORE</p>
+            <p id="hud-hiscore" class="panel-value">000000</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">STAGE</p>
+            <p id="hud-stage" class="panel-value cyan">1-1</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">POWER</p>
+            <div id="hud-power-bar" class="power-bar">
+              <div id="hud-power-fill" class="power-fill"></div>
+            </div>
+            <p id="hud-power-label" class="panel-value small">LV 1</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">GRAZE</p>
+            <p id="hud-graze" class="panel-value small pink">0</p>
+          </div>
+        </div>
+
+        <!-- Canvas principal -->
+        <div class="canvas-wrapper" id="canvas-wrapper-game">
+          <canvas id="canvas-main" width="480" height="640"></canvas>
+
+          <!-- Overlay de pausa -->
+          <div id="pause-overlay" class="game-overlay hidden">
+            <div class="overlay-box">
+              <h2 class="overlay-title">— PAUSED —</h2>
+              <button id="btn-resume" class="arcade-btn primary">▶ RESUME</button>
+              <button id="btn-menu-from-pause" class="arcade-btn secondary">⌂ MAIN MENU</button>
+            </div>
+          </div>
+
+          <!-- Overlay de boss warning -->
+          <div id="boss-warning" class="game-overlay hidden">
+            <div class="boss-warning-text blink-fast">⚠ WARNING ⚠<br/>BOSS APPROACHING</div>
+          </div>
+
+          <!-- Overlay de stage clear -->
+          <div id="stage-clear-overlay" class="game-overlay hidden">
+            <div class="overlay-box slim">
+              <h2 class="overlay-title gold">STAGE CLEAR!</h2>
+              <p id="stage-clear-score" class="panel-value">BONUS: +50000</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel derecho: vidas, bombas, escudo, boss HP -->
+        <div class="panel-right">
+          <div class="panel-info">
+            <p class="panel-label">LIVES</p>
+            <div id="hud-lives" class="lives-row">
+              <span class="life-icon">★</span>
+              <span class="life-icon">★</span>
+              <span class="life-icon">★</span>
+            </div>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">BOMBS</p>
+            <div id="hud-bombs" class="lives-row">
+              <span class="bomb-icon">💣</span>
+              <span class="bomb-icon">💣</span>
+              <span class="bomb-icon">💣</span>
+            </div>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">SHIELD</p>
+            <div id="hud-shield" class="shield-bar-wrap">
+              <div id="hud-shield-fill" class="shield-bar"></div>
+            </div>
+          </div>
+          <div class="panel-info" id="boss-hp-panel" style="display:none">
+            <p class="panel-label pink">BOSS HP</p>
+            <div class="boss-hp-wrap">
+              <div id="hud-boss-hp-fill" class="boss-hp-fill"></div>
+            </div>
+            <p id="hud-boss-phase" class="panel-value small pink">PHASE 1</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">FOCUS</p>
+            <p class="ctrl-row small">SHIFT ⇧</p>
+          </div>
+          <div class="panel-info">
+            <p class="panel-label">WEAPON</p>
+            <p id="hud-weapon" class="panel-value small cyan">SPREAD</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="cabinet-footer">
+        <span id="fps-counter" class="fps-label">60 FPS</span>
+        <span>| ESC = PAUSE | SHIFT = FOCUS MODE |</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PANTALLA: GAME OVER ==================== -->
+  <div id="screen-gameover" class="screen">
+    <div class="arcade-cabinet small-cabinet">
+      <div class="cabinet-body centered">
+        <div class="game-over-box">
+          <h2 class="gameover-title">GAME OVER</h2>
+          <div class="gameover-stats">
+            <div class="stat-row">
+              <span class="stat-label">FINAL SCORE</span>
+              <span id="go-final-score" class="stat-value gold">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">HIGH SCORE</span>
+              <span id="go-hiscore" class="stat-value">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">STAGE REACHED</span>
+              <span id="go-stage" class="stat-value cyan">1-1</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">ENEMIES DEFEATED</span>
+              <span id="go-enemies" class="stat-value">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">BOSSES DEFEATED</span>
+              <span id="go-bosses" class="stat-value pink">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">GRAZE COUNT</span>
+              <span id="go-graze" class="stat-value">0</span>
+            </div>
+          </div>
+          <div id="go-new-record" class="new-record hidden blink">✦ NEW RECORD! ✦</div>
+          <div class="go-buttons">
+            <button id="btn-retry" class="arcade-btn primary">↩ RETRY</button>
+            <button id="btn-menu-from-go" class="arcade-btn secondary">⌂ MAIN MENU</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PANTALLA: HIGH SCORES ==================== -->
+  <div id="screen-scores" class="screen">
+    <div class="arcade-cabinet small-cabinet">
+      <div class="cabinet-marquee">
+        <span class="marquee-text">✦ HALL OF FAME — TOP 10 PILOTS ✦</span>
+      </div>
+      <div class="cabinet-body centered">
+        <div class="scores-box">
+          <h2 class="scores-title">🏆 HIGH SCORES</h2>
+          <table class="scores-table" id="scores-table">
+            <thead>
+              <tr><th>#</th><th>PILOT</th><th>SCORE</th><th>STAGE</th></tr>
+            </thead>
+            <tbody id="scores-tbody"></tbody>
+          </table>
+          <button id="btn-scores-back" class="arcade-btn secondary mt">← BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PANTALLA: VICTORIA ==================== -->
+  <div id="screen-victory" class="screen">
+    <div class="arcade-cabinet small-cabinet">
+      <div class="cabinet-body centered">
+        <div class="victory-box">
+          <h2 class="victory-title">🌟 ALL CLEAR! 🌟</h2>
+          <p class="victory-sub">THE GALAXY IS SAVED!</p>
+          <div class="gameover-stats">
+            <div class="stat-row">
+              <span class="stat-label">FINAL SCORE</span>
+              <span id="vic-final-score" class="stat-value gold">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">ENEMIES DEFEATED</span>
+              <span id="vic-enemies" class="stat-value">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">BOSSES DEFEATED</span>
+              <span id="vic-bosses" class="stat-value pink">3</span>
+            </div>
+          </div>
+          <div id="vic-new-record" class="new-record hidden blink">✦ NEW RECORD! ✦</div>
+          <div class="go-buttons">
+            <button id="btn-play-again" class="arcade-btn primary">↩ PLAY AGAIN</button>
+            <button id="btn-menu-from-vic" class="arcade-btn secondary">⌂ MAIN MENU</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts (orden de dependencias) -->
+  <script src="js/audio.js"></script>
+  <script src="js/bullets.js"></script>
+  <script src="js/powerups.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
